@@ -1,0 +1,22 @@
+!SESSION 2015-09-01 00:37:04.718 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.7.0_25
+java.vendor=Oracle Corporation
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=ko_KR
+Framework arguments:  -product org.eclipse.epp.package.jee.product -keyring /Users/jeongyeoeun/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.jee.product -keyring /Users/jeongyeoeun/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2015-09-01 00:37:29.631
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY com.android.ide.eclipse.adt 4 0 2015-09-01 00:39:18.224
+!MESSAGE Failed to load properties file for project 'SinNaYeoAndroid'
+
+!ENTRY com.android.ide.eclipse.adt 4 0 2015-09-01 00:39:18.236
+!MESSAGE Failed to load properties file for project 'SinNaYeoAndroid'
+
+!ENTRY com.android.ide.eclipse.adt 4 0 2015-09-01 00:39:18.237
+!MESSAGE Failed to load properties file for project 'SinNaYeoAndroid'
+
+!ENTRY com.android.ide.eclipse.adt 4 0 2015-09-01 00:39:18.260
+!MESSAGE Failed to load properties file for project 'SinNaYeoAndroid'
