@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
-    android:padding="10dp"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".SinNaYeoMainActivity" >
 
     <LinearLayout
@@ -35,14 +35,15 @@
         android:id="@+id/main_outing_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="mOnClick"
         android:src="@drawable/ic_launcher" />
 
     <TextView
         android:id="@+id/main_outing_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:text="외출 관리는 2시간 후에 시작됩니다." />
+        android:text="외출 관리는 2시간 후에 시작됩니다."
+        android:visibility="invisible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -113,18 +114,20 @@
         android:id="@+id/main_window_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="mOnClick"
         android:src="@drawable/ic_launcher" />
 
     <ImageButton
         android:id="@+id/main_humidifier_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="mOnClick"
         android:src="@drawable/ic_launcher" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" >
 
         <TextView
             android:layout_width="wrap_content"

@@ -6,14 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import swc.test.sockettest.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -21,7 +19,7 @@ public class SinNaYeoMainActivity extends Activity {
 	private Socket socket;
 	BufferedReader in;
 	PrintWriter out;
-	String data, ipAddress;
+	String request, result, ipAddress;
 	TextView tvOuting, tvNowTemper, tvNowHumid, tvSetTemper, tvSetHumid, tvIp;
 	ImageButton btnOuting, btnWindow, btnHumidifier;
 
@@ -32,12 +30,11 @@ public class SinNaYeoMainActivity extends Activity {
 
 		init();
 
-		// new AlertDialog.Builder(this)
-		// .setTitle("title").setMessage("message")
-		// .setPositiveButton("??????", null).show();
-
-		// 1번은온도받기2번이 습도 3번은 창문열기 4번은창문닫기야
-		// 그리고 목표온습도설정은 온도-습도 로 쏴줘
+		// 1번은온도받기 2번습도 3번은 창문열기 4번은 창문닫기
+		// 그리고 목표온습도설정은 온도-습도 로
+		for (int i = 1; i < 3; i++) {
+			request = "" + i;
+		}
 
 		Thread worker = new Thread() {
 			public void run() {
@@ -53,14 +50,28 @@ public class SinNaYeoMainActivity extends Activity {
 
 				try {
 					while (true) {
-						data = in.readLine();
-						Log.i("****data", data);
-
-						tvNowTemper.post(new Runnable() {
-							public void run() {
-								tvNowTemper.setText(data);
-							}
-						});
+						result = in.readLine();
+						Log.i("****data", result);
+						if (request.equals("1")) {
+							tvNowTemper.post(new Runnable() {
+								public void run() {
+									tvNowTemper.setText(result);
+								}
+							});
+						} else if (request.equals("2")) {
+							tvNowHumid.post(new Runnable() {
+								public void run() {
+									tvNowTemper.setText(result);
+								}
+							});
+						} else if (request.equals("3")) {
+							// btnWindow.setImageResource(R.drawable.xx);
+						} else if (request.equals("5")) {
+							// btnWindow.setImageResource(R.drawable.xx);
+						} else {
+							
+						}
+						request = "0";
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -69,6 +80,25 @@ public class SinNaYeoMainActivity extends Activity {
 		};
 
 		worker.start(); // onResume()?????? ??????.
+	}
+
+	public void mOnClick(View v) {
+		switch (v.getId()) {
+		case R.id.main_outing_btn:
+			request = "0";
+			 new AlertDialog.Builder(this)
+			 .setTitle("귀가시간?").setMessage("custom dialog 써야할듯")
+			 .setPositiveButton("확인", null).show();
+			break;
+		case R.id.main_window_btn:
+			request = "3";
+			break;
+		case R.id.main_humidifier_btn:
+			request = "5";
+			break;
+		default:
+			break;
+		}
 	}
 
 	private void init() {
