@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="swc.test.sockettest"
+    package="swc.sny.activity"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingActivity"
+            android:name="swc.sny.activity.SettingActivity"
             android:label="@string/title_activity_setting" >
         </activity>
     </application>

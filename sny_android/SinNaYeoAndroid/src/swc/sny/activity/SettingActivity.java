@@ -1,4 +1,4 @@
-package swc.test.sockettest;
+package swc.sny.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
