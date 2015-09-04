@@ -1,0 +1,10 @@
+package swc.sny.thread;
+
+public class GetInfoThread extends Thread {
+	public GetInfoThread() {
+	}
+	
+	public void run() {
+		
+	}
+}

@@ -39,6 +39,18 @@
         android:src="@drawable/ic_launcher" />
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="외출모드 ON / OFF" />
+
+    <Button
+        android:id="@+id/main_renew_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="새로고침"
+        android:onClick="mOnClick"/>
+
+    <TextView
         android:id="@+id/main_outing_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="24"
+                android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
@@ -98,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="45"
+                android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
@@ -117,6 +129,12 @@
         android:onClick="mOnClick"
         android:src="@drawable/ic_launcher" />
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="창문 OPEN / CLOSE" />
+
     <ImageButton
         android:id="@+id/main_humidifier_btn"
         android:layout_width="wrap_content"
@@ -124,7 +142,13 @@
         android:onClick="mOnClick"
         android:src="@drawable/ic_launcher" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="가습기 ON / OFF" />
+
     <LinearLayout
+		android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom" >

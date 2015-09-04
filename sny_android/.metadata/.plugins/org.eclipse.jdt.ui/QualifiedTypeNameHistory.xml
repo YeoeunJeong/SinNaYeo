@@ -3,4 +3,12 @@
 <fullyQualifiedTypeName name="android.content.SharedPreferences"/>
 <fullyQualifiedTypeName name="swc.sny.activity.ConnectActivity"/>
 <fullyQualifiedTypeName name="swc.sny.activity.SinNaYeoMainActivity"/>
+<fullyQualifiedTypeName name="android.widget.TextView"/>
+<fullyQualifiedTypeName name="android.widget.ImageButton"/>
+<fullyQualifiedTypeName name="swc.test.sockettest.R.id"/>
+<fullyQualifiedTypeName name="swc.test.sockettest.R.drawable"/>
+<fullyQualifiedTypeName name="android.app.AlertDialog"/>
+<fullyQualifiedTypeName name="java.lang.Thread"/>
+<fullyQualifiedTypeName name="android.content.IntentSender.SendIntentException"/>
+<fullyQualifiedTypeName name="swc.sny.activity.SinNaYeoMainActivity.GetInfoThread"/>
 </qualifiedTypeNameHistroy>
