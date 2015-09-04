@@ -13,12 +13,12 @@ import android.widget.EditText;
 public class ConnectActivity extends Activity {
 	EditText editIp; 
 	Button connectBtn;
-
+ 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect);
-
+    
 		// start
 		editIp = (EditText) findViewById(R.id.connect_edit_ip); 
 		connectBtn = (Button) findViewById(R.id.connect_btn); 
