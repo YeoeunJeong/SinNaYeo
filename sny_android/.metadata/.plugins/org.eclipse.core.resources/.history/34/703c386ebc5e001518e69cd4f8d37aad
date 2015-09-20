@@ -1,0 +1,320 @@
+package swc.sny.activity;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import swc.sny.service.GetDataService;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+public class SinNaYeoMainActivity extends Activity {
+	private Socket socket;
+	BufferedReader in;
+	PrintWriter out;
+	private String request, result, ipAddress;
+	private TextView tvOuting, tvNowTemper, tvNowHumid, tvSetTemper,
+			tvSetHumid, tvIp;
+	private ImageButton btnAuto, btnOuting, btnWindow, btnHumidifier,
+			btnSetting;
+	private Button btnRenew;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_sin_na_yeo_main);
+
+		init();
+
+		// 1번은온도받기 2번습도 3번은 창문열기 4번은 창문닫기
+		// 그리고 목표온습도설정은 온도-습도 로
+
+		Thread worker = new Thread() {
+			public void run() {
+				try {
+					try {
+						if (ipAddress != null) {
+							socket = new Socket(ipAddress, 5555);
+							// out = new PrintWriter(socket.getOutputStream(),
+							// true);
+							// in = new BufferedReader(new InputStreamReader(
+							// socket.getInputStream()));
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					// while (true) {
+					// result = in.readLine();
+					// Log.i("****result", result);
+					// getTempHumid(result);
+					// if (request.equals("1")) {
+					// // tvNowTemper.post(new Runnable() {
+					// // public void run() {
+					// // tvNowTemper.setText(result);
+					// // }
+					// // });
+					// } else if (request.equals("3")) {
+					// // btnWindow.setImageResource(R.drawable.xx);
+					// } else if (request.equals("5")) {
+					// // btnWindow.setImageResource(R.drawable.xx);
+					// } else {
+					//
+					// }
+					// request = "0";
+					// }
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
+		worker.start();
+
+		// GetInfoThread infoWorker = new GetInfoThread();
+		// infoWorker.start();
+
+		Intent startIntent = new Intent(GetDataService.class.getName());
+		startIntent.putExtra("ipAddr", ipAddress);
+		// startService(startIntent);
+
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
+
+	}
+
+	public void mOnClick(View v) throws IOException {
+		final Dialog dialog;
+		switch (v.getId()) {
+		case R.id.main_automode_btn:
+//			sendRequest("");
+		case R.id.main_outing_btn:
+//			request = "o"; // on : o, off : f
+//			out.println(request);
+			new AlertDialog.Builder(this).setTitle("귀가시간?")
+					.setMessage("custom dialog 써야할듯")
+					.setPositiveButton("확인", null).show();
+			//
+
+
+			Rect displayRectangle = new Rect();
+			if (dialg != null) {
+				dialog.dismiss();
+				dialog = null;
+			}
+			dialog = new Dialog(SinNaYeoMainActivity.this);
+			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			Window window = dialog.getWindow();
+			window.getDecorView().getWindowVisibleDisplayFrame(
+					displayRectangle);
+			WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
+			wlp.copyFrom(window.getAttributes());
+			wlp.width = (int) (displayRectangle.width() * 0.69f);
+			wlp.height = (int) (displayRectangle.height() * 0.65f);
+
+			dialog.getWindow().setAttributes(wlp);
+			dialog.getWindow().setBackgroundDrawable(
+					new ColorDrawable(android.graphics.Color.TRANSPARENT));
+			LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+			View dialogView = (LinearLayout) vi.inflate(R.layout.dialog_outing_setting, null);
+
+			final TimePicker time = (TimePicker) dialogView.findViewById(R.id.dialog_timepicker);
+			
+			ImageButton btnOk = (ImageButton) dialogView.findViewById(R.id.dialog_ok_btn);
+			ImageButton btnCancel = (ImageButton) dialogView.findViewById(R.id.dialog_cancel_btn);
+
+			btnOk.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					Toast.makeText(SinNaYeoMainActivity.this, "설정되었습니다.", Toast.LENGTH_LONG).show();
+				}
+			});
+
+			btnOk.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					dialog.cancel();
+				}
+			});
+
+			dialog.setCancelable(true);
+			dialog.setContentView(dialogView);
+			dialog.show();
+		
+			break;
+		case R.id.main_renew_btn:
+			// request = "1";
+			sendRequest("1");
+
+			try {
+				in = new BufferedReader(new InputStreamReader(
+						socket.getInputStream()));
+				getTempHumid(in.readLine());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			break;
+		case R.id.main_window_btn:
+			sendRequest("3");
+			break;
+		case R.id.main_humidifier_btn:
+			sendRequest("2");
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void getTempHumid(String res) {
+		if (in != null) {
+			final String[] data = res.split(" ");
+			Log.i("****data", "" + data[0] + ", " + data[1]);
+
+			tvNowTemper.setText(data[0] + " 도");
+			tvNowHumid.setText(data[1] + " %");
+
+			// final Handler handler = new Handler();
+			//
+			// new Thread(new Runnable() {
+			// @Override
+			// public void run() {
+			// handler.postDelayed(new Runnable() {
+			// public void run() {
+			// Toast.makeText(
+			// SinNaYeoMainActivity.this,
+			// "현재온도 : " + data[0] + ", 현재 습도 : "
+			// + data[1], 1).show();
+			//
+			// tvNowTemper.setText(data[0] + " 도");
+			// tvNowHumid.setText(data[1] + " %");
+			// }
+			// }, 100);
+			// }
+			// }).start();
+		}
+
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case 100:
+			if (resultCode == RESULT_OK) {
+				String setT = data.getStringExtra("setT");
+				String setH = data.getStringExtra("setH");
+
+				Log.i("****setTH", setT + "-" + setH);
+
+				tvSetTemper.setText("  설정 온도 : " + setT);
+				tvSetHumid.setText("  설정 습도 : " + setH);
+
+				try {
+					sendRequest(setT + "-" + setH);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				try {
+					in = new BufferedReader(new InputStreamReader(
+							socket.getInputStream()));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	private void init() {
+		tvOuting = (TextView) findViewById(R.id.main_outing_tv);
+		tvNowTemper = (TextView) findViewById(R.id.main_now_temper_tv);
+		tvNowHumid = (TextView) findViewById(R.id.main_now_humid_tv);
+		tvSetTemper = (TextView) findViewById(R.id.main_set_temper_tv);
+		tvSetHumid = (TextView) findViewById(R.id.main_set_humid_tv);
+
+		SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+		ipAddress = pref.getString("ip_address", "");
+		tvIp = (TextView) findViewById(R.id.main_ip_tv);
+		tvIp.setText(ipAddress);
+
+		btnAuto = (ImageButton) findViewById(R.id.main_automode_btn);
+		btnOuting = (ImageButton) findViewById(R.id.main_outing_btn);
+		btnRenew = (Button) findViewById(R.id.main_renew_btn);
+		btnWindow = (ImageButton) findViewById(R.id.main_window_btn);
+		btnHumidifier = (ImageButton) findViewById(R.id.main_humidifier_btn);
+		btnSetting = (ImageButton) findViewById(R.id.main_setting_btn);
+
+		btnSetting.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(SinNaYeoMainActivity.this,
+						SettingActivity.class);
+				startActivityForResult(intent, 100);
+			}
+		});
+
+		request = "0";
+	}
+
+	private void sendRequest(String req) throws IOException {
+		out = new PrintWriter(socket.getOutputStream(), true);
+
+		request = "req";
+		if (out != null) {
+			out.println(req);
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
+	class GetInfoThread extends Thread {
+		public GetInfoThread() {
+
+		}
+
+		public void run() {
+			try {
+				Thread.sleep(100000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
