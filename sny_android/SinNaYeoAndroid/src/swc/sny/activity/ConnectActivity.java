@@ -9,10 +9,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 public class ConnectActivity extends Activity {
 	EditText editIp; 
-	Button connectBtn;
+	ImageButton connectBtn;
  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +22,7 @@ public class ConnectActivity extends Activity {
     
 		// start
 		editIp = (EditText) findViewById(R.id.connect_edit_ip); 
-		connectBtn = (Button) findViewById(R.id.connect_btn); 
+		connectBtn = (ImageButton) findViewById(R.id.connect_btn); 
 		connectBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				String strIp = editIp.getText().toString();

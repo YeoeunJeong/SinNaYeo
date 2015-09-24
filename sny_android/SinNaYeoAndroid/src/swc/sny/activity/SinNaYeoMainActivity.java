@@ -7,16 +7,24 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.LogManager;
+
+import com.google.android.gcm.GCMRegistrar;
 
 import swc.sny.service.GetDataService;
+import swc.sny.service.LocationReceiver;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,16 +44,18 @@ public class SinNaYeoMainActivity extends Activity {
 	private Socket socket;
 	BufferedReader in;
 	PrintWriter out;
+	LocationManager locMgr;
+	PendingIntent pIntent;
+
 	private String request, result, ipAddress;
-	private TextView tvOuting, tvNowTemper, tvNowHumid, tvSetTemper,
-			tvSetHumid, tvIp, tvTime;
+	private TextView tvNowTemper, tvNowHumid, tvSetTemper, tvSetHumid, tvIp,
+			tvTime;
 	private ImageButton btnAuto, btnOuting, btnWindow, btnHumidifier,
-			btnSetting;
-	private Button btnRenew;
+			btnSetting, btnRenew;
 	private Calendar calendar;
 	private Date crtDate, setDate;
 	long setTime, leftTime;
-	int flagAutomode;
+	int flagAutoMode, flagOutingMode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +108,37 @@ public class SinNaYeoMainActivity extends Activity {
 		};
 		worker.start();
 
+		final Handler handler = new Handler();
+		if (socket != null) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								sendRequest("1");
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							try {
+								in = new BufferedReader(new InputStreamReader(
+										socket.getInputStream()));
+								getTempHumid(in.readLine());
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		}
 		// GetInfoThread infoWorker = new GetInfoThread();
 		// infoWorker.start();
 
@@ -118,19 +159,35 @@ public class SinNaYeoMainActivity extends Activity {
 		switch (v.getId()) {
 		case R.id.main_automode_btn:
 			// sendRequest("");
-			if (flagAutomode == 0) {
-				flagAutomode = 1;
-				// btnAuto.setImageResource(R.drawable.);
+			if (flagAutoMode == 0) {
+				flagAutoMode = 1;
+				btnAuto.setImageResource(R.drawable.btn_auto_on);
 				btnOuting.setClickable(true);
+				btnOuting.setImageResource(R.drawable.btn_outing_off);
 			} else {
-				flagAutomode = 0;
-				// btnAuto.setImageResource(R.drawable.);
+				flagAutoMode = 0;
+				btnAuto.setImageResource(R.drawable.btn_auto_off);
+				flagOutingMode = 0;
 				btnOuting.setClickable(false);
+				btnOuting.setImageResource(R.drawable.btn_outing_nonclickable);
 			}
 
 		case R.id.main_outing_btn:
 			// request = "o"; // on : o, off : f
 			// out.println(request);
+			if (flagOutingMode == -1) {
+				Toast.makeText(SinNaYeoMainActivity.this, "자동모드를 켜주세요", 1)
+						.show();
+			} else if (flagOutingMode == 0) {
+				flagOutingMode = 1;
+				btnOuting.setClickable(true);
+				btnOuting.setImageResource(R.drawable.btn_outing_on);
+
+			} else {
+				flagOutingMode = 0;
+				btnOuting.setClickable(true);
+				btnOuting.setImageResource(R.drawable.btn_outing_off);
+			}
 
 			Rect displayRectangle = new Rect();
 			if (dialog != null) {
@@ -171,31 +228,40 @@ public class SinNaYeoMainActivity extends Activity {
 					setDate.setHours(time.getCurrentHour());
 					setDate.setMinutes(time.getCurrentMinute());
 
-					setTime = setDate.getTime() - 30 * 60 * 1000;
-					String sTime = "b" + (setTime / 1000 / 60 / 60)
-							+ ":" +  (setTime / 1000 % 60) + ":00";
-					try {
-						sendRequest(sTime);
-					} catch (IOException e) {
-						e.printStackTrace();
+					if ((time.getCurrentHour() == 0)
+							&& (time.getCurrentMinute() < 30)) {
+						Toast.makeText(SinNaYeoMainActivity.this,
+								"최소 30분 이후의 시간을 선택해주세요", 1).show();
+					} else {
+						setTime = setDate.getTime() - 30 * 60 * 1000;
+						String sTime = "b" + (setTime / 1000 / 60 / 60) + ":"
+								+ (setTime / 1000 % 60) + ":00";
+
+						try {
+							sendRequest(sTime);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+						leftTime = setDate.getTime() - crtDate.getTime();
+
+						Toast.makeText(
+								SinNaYeoMainActivity.this,
+								"[ " + (leftTime / 1000 / 60 / 60) + "시간 "
+										+ (leftTime / 1000 % 60)
+										+ "분 ] 후로 설정되었습니다.", Toast.LENGTH_LONG)
+								.show();
+						// InputMethodManager imm = (InputMethodManager)
+						// getSystemService(Context.INPUT_METHOD_SERVICE);
+						// imm.hideSoftInputFromWindow(edit_time.getWindowToken(),
+						// 0);
+
+						tvTime.setText("[ " + (leftTime / 1000 / 60 / 60)
+								+ "시간 " + (leftTime / 1000 % 60)
+								+ "분 ] 후로 설정되었습니다.");
+
+						dialog.cancel();
 					}
-					
-					leftTime = setDate.getTime() - crtDate.getTime();
-
-					Toast.makeText(
-							SinNaYeoMainActivity.this,
-							"[ " + (leftTime / 1000 / 60 / 60) + "시간 "
-									+ (leftTime / 1000 % 60)
-									+ "분 ] 후로 설정되었습니다.", Toast.LENGTH_LONG)
-							.show();
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					// imm.hideSoftInputFromWindow(edit_time.getWindowToken(),
-					// 0);
-
-					tvTime.setText("[ " + (leftTime / 1000 / 60 / 60) + "시간 "
-							+ (leftTime / 1000 % 60) + "분 ] 후로 설정되었습니다.");
-
-					dialog.cancel();
 				}
 			});
 
@@ -235,6 +301,20 @@ public class SinNaYeoMainActivity extends Activity {
 		}
 	}
 
+	public void registerGcm() {
+		GCMRegistrar.checkDevice(this);
+		GCMRegistrar.checkManifest(this);
+		final String regId = GCMRegistrar.getRegistrationId(this);
+
+		if (regId.equals("")) {
+			Log.d("Tag", regId);
+			Toast.makeText(SinNaYeoMainActivity.this, regId, 1).show();
+			GCMRegistrar.register(this, "798195391733");
+		} else {
+			Log.d("Tag", regId);
+		}
+	}
+
 	private void getTempHumid(String res) {
 		if (in != null) {
 			final String[] data = res.split(" ");
@@ -242,25 +322,6 @@ public class SinNaYeoMainActivity extends Activity {
 
 			tvNowTemper.setText(data[0] + " 도");
 			tvNowHumid.setText(data[1] + " %");
-
-			// final Handler handler = new Handler();
-			//
-			// new Thread(new Runnable() {
-			// @Override
-			// public void run() {
-			// handler.postDelayed(new Runnable() {
-			// public void run() {
-			// Toast.makeText(
-			// SinNaYeoMainActivity.this,
-			// "현재온도 : " + data[0] + ", 현재 습도 : "
-			// + data[1], 1).show();
-			//
-			// tvNowTemper.setText(data[0] + " 도");
-			// tvNowHumid.setText(data[1] + " %");
-			// }
-			// }, 100);
-			// }
-			// }).start();
 		}
 
 	}
@@ -298,12 +359,11 @@ public class SinNaYeoMainActivity extends Activity {
 	}
 
 	private void init() {
-		tvOuting = (TextView) findViewById(R.id.main_outing_tv);
 		tvNowTemper = (TextView) findViewById(R.id.main_now_temper_tv);
 		tvNowHumid = (TextView) findViewById(R.id.main_now_humid_tv);
 		tvSetTemper = (TextView) findViewById(R.id.main_set_temper_tv);
 		tvSetHumid = (TextView) findViewById(R.id.main_set_humid_tv);
-		tvTime = (TextView) findViewById(R.id.main_time_tv);
+		tvTime = (TextView) findViewById(R.id.main_outing_tv);
 
 		SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 		ipAddress = pref.getString("ip_address", "");
@@ -312,7 +372,7 @@ public class SinNaYeoMainActivity extends Activity {
 
 		btnAuto = (ImageButton) findViewById(R.id.main_automode_btn);
 		btnOuting = (ImageButton) findViewById(R.id.main_outing_btn);
-		btnRenew = (Button) findViewById(R.id.main_renew_btn);
+		btnRenew = (ImageButton) findViewById(R.id.main_renew_btn);
 		btnWindow = (ImageButton) findViewById(R.id.main_window_btn);
 		btnHumidifier = (ImageButton) findViewById(R.id.main_humidifier_btn);
 		btnSetting = (ImageButton) findViewById(R.id.main_setting_btn);
@@ -327,7 +387,14 @@ public class SinNaYeoMainActivity extends Activity {
 		});
 
 		request = "0";
-		flagAutomode = 0;
+		flagAutoMode = 0;
+		flagOutingMode = -1;
+
+		locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		Intent intent = new Intent(this, LocationReceiver.class);
+		pIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+		registerGcm();
 	}
 
 	private void sendRequest(String req) throws IOException {
@@ -342,6 +409,15 @@ public class SinNaYeoMainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		locMgr.addProximityAlert(37.6065142, 127.0417786, 1000, -1, pIntent);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		locMgr.removeProximityAlert(pIntent);
 	}
 
 	@Override
@@ -349,17 +425,17 @@ public class SinNaYeoMainActivity extends Activity {
 		super.onStop();
 	}
 
-	class GetInfoThread extends Thread {
-		public GetInfoThread() {
-
-		}
-
-		public void run() {
+	class InfoHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
 			try {
-				Thread.sleep(100000);
-			} catch (InterruptedException e) {
+				in = new BufferedReader(new InputStreamReader(
+						socket.getInputStream()));
+				getTempHumid(in.readLine());
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			super.handleMessage(msg);
 		}
 	}
 }

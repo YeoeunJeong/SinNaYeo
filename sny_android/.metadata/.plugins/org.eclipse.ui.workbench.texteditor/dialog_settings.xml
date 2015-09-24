@@ -3,26 +3,26 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="265" key="DIALOG_WIDTH"/>
 		<item value="168" key="DIALOG_Y_ORIGIN"/>
-		<item value="946" key="DIALOG_X_ORIGIN"/>
 		<item value="399" key="DIALOG_HEIGHT"/>
+		<item value="946" key="DIALOG_X_ORIGIN"/>
 		<item value="1|.Helvetica Neue DeskInterface|11.0|0|COCOA|1|.HelveticaNeueDeskInterface-Regular" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="casesensitive"/>
 		<item value="false" key="isRegEx"/>
+		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="써" key="selection"/>
+		<item value="RegistrationId" key="selection"/>
 		<list key="findhistory">
-			<item value="써"/>
-			<item value="vi."/>
-			<item value="vi"/>
-			<item value="btnOuting"/>
-			<item value="init"/>
-			<item value="main_renew_btn"/>
-			<item value="onr"/>
-			<item value="intent"/>
+			<item value="registrationId"/>
+			<item value="registration"/>
+			<item value="regi"/>
+			<item value="sendRequest(&quot;1&quot;)"/>
+			<item value="handle"/>
+			<item value="37"/>
+			<item value="loca"/>
+			<item value="loc"/>
 		</list>
 		<list key="replacehistory">
 		</list>
