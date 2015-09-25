@@ -54,7 +54,6 @@
             android:name="com.google.android.gcm.GCMBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
-
                 <!-- Receives the actual messages. -->
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <!-- Receives the registration id. -->
@@ -64,7 +63,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="swc.sny.service.GCMIntentService" >
+        <service android:name="swc.sny.activity.GCMIntentService" >
         </service>
         <service
             android:name="swc.sny.service.GetDataService"

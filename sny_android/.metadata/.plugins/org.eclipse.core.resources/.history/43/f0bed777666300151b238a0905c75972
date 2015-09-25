@@ -63,7 +63,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="swc.sny.activity.GCMIntentService" >
+        <service android:name="swc.sny.service.GCMIntentService" >
         </service>
         <service
             android:name="swc.sny.service.GetDataService"
