@@ -14,7 +14,6 @@
 <fullyQualifiedTypeName name="swc.sny.activity.SettingActivity"/>
 <fullyQualifiedTypeName name="java.lang.String"/>
 <fullyQualifiedTypeName name="swc.sny.service.GetDataService"/>
-<fullyQualifiedTypeName name="android.widget.ImageButton"/>
 <fullyQualifiedTypeName name="swc.sny.activity.R.id"/>
 <fullyQualifiedTypeName name="android.graphics.Rect"/>
 <fullyQualifiedTypeName name="android.app.Dialog"/>
@@ -31,7 +30,6 @@
 <fullyQualifiedTypeName name="java.util.Calendar"/>
 <fullyQualifiedTypeName name="android.text.format.Time"/>
 <fullyQualifiedTypeName name="java.util.Date"/>
-<fullyQualifiedTypeName name="swc.sny.activity.R.drawable"/>
 <fullyQualifiedTypeName name="swc.sny.activity.R"/>
 <fullyQualifiedTypeName name="com.google.android.gcm.GCMRegistrar"/>
 <fullyQualifiedTypeName name="java.util.logging.LogManager"/>
@@ -40,8 +38,11 @@
 <fullyQualifiedTypeName name="android.widget.Toast"/>
 <fullyQualifiedTypeName name="swc.sny.service.LocationReceiver"/>
 <fullyQualifiedTypeName name="android.location.LocationManager"/>
-<fullyQualifiedTypeName name="swc.sny.activity.SinNaYeoMainActivity"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="android.os.Message"/>
 <fullyQualifiedTypeName name="java.lang.Thread"/>
+<fullyQualifiedTypeName name="android.widget.ImageButton"/>
+<fullyQualifiedTypeName name="java.lang.Runnable"/>
+<fullyQualifiedTypeName name="swc.sny.activity.R.drawable"/>
+<fullyQualifiedTypeName name="swc.sny.activity.SinNaYeoMainActivity"/>
 </qualifiedTypeNameHistroy>

@@ -162,13 +162,13 @@ public class SinNaYeoMainActivity extends Activity {
 			if (flagAutoMode == 0) {
 				flagAutoMode = 1;
 				btnAuto.setImageResource(R.drawable.btn_auto_on);
-				flagOutingMode = 0;
 				btnOuting.setClickable(true);
+				flagOutingMode = 0;
 				btnOuting.setImageResource(R.drawable.btn_outing_off);
 			} else if (flagAutoMode == 1) {
 				flagAutoMode = 0;
 				btnAuto.setImageResource(R.drawable.btn_auto_off);
-				flagOutingMode = -1;
+				flagOutingMode = 1;
 				btnOuting.setClickable(false);
 				btnOuting.setImageResource(R.drawable.btn_outing_nonclickable);
 			}
@@ -304,7 +304,7 @@ public class SinNaYeoMainActivity extends Activity {
 			break;
 		}
 	}
-	
+
 	public void registerGcm() {
 		GCMRegistrar.checkDevice(this);
 		GCMRegistrar.checkManifest(this);

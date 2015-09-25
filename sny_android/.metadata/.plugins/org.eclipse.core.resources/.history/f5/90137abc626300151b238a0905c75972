@@ -162,13 +162,12 @@ public class SinNaYeoMainActivity extends Activity {
 			if (flagAutoMode == 0) {
 				flagAutoMode = 1;
 				btnAuto.setImageResource(R.drawable.btn_auto_on);
-				flagOutingMode = 0;
 				btnOuting.setClickable(true);
 				btnOuting.setImageResource(R.drawable.btn_outing_off);
-			} else if (flagAutoMode == 1) {
+			} else {
 				flagAutoMode = 0;
 				btnAuto.setImageResource(R.drawable.btn_auto_off);
-				flagOutingMode = -1;
+				flagOutingMode = 0;
 				btnOuting.setClickable(false);
 				btnOuting.setImageResource(R.drawable.btn_outing_nonclickable);
 			}
@@ -179,18 +178,15 @@ public class SinNaYeoMainActivity extends Activity {
 			if (flagOutingMode == -1) {
 				Toast.makeText(SinNaYeoMainActivity.this, "자동모드를 켜주세요", 1)
 						.show();
-				flagOutingMode = -1;
 			} else if (flagOutingMode == 0) {
 				flagOutingMode = 1;
 				btnOuting.setClickable(true);
 				btnOuting.setImageResource(R.drawable.btn_outing_on);
 
-			} else if (flagOutingMode == 1) {
+			} else {
 				flagOutingMode = 0;
 				btnOuting.setClickable(true);
 				btnOuting.setImageResource(R.drawable.btn_outing_off);
-			} else {
-
 			}
 
 			Rect displayRectangle = new Rect();
@@ -304,7 +300,7 @@ public class SinNaYeoMainActivity extends Activity {
 			break;
 		}
 	}
-	
+
 	public void registerGcm() {
 		GCMRegistrar.checkDevice(this);
 		GCMRegistrar.checkManifest(this);
