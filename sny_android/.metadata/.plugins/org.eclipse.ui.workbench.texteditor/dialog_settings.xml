@@ -3,26 +3,26 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="265" key="DIALOG_WIDTH"/>
 		<item value="168" key="DIALOG_Y_ORIGIN"/>
-		<item value="946" key="DIALOG_X_ORIGIN"/>
 		<item value="399" key="DIALOG_HEIGHT"/>
+		<item value="946" key="DIALOG_X_ORIGIN"/>
 		<item value="1|.Helvetica Neue DeskInterface|11.0|0|COCOA|1|.HelveticaNeueDeskInterface-Regular" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="casesensitive"/>
 		<item value="false" key="isRegEx"/>
+		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="sendMessage" key="selection"/>
+		<item value="getTem" key="selection"/>
 		<list key="findhistory">
-			<item value="sendMessage"/>
-			<item value="renew"/>
-			<item value="tvOuting"/>
-			<item value="outing_tv"/>
-			<item value="main_time_tv"/>
-			<item value="registrationId"/>
-			<item value="registration"/>
-			<item value="regi"/>
+			<item value="getTem"/>
+			<item value="clickable"/>
+			<item value="click"/>
+			<item value="main_outing_tv"/>
+			<item value="&quot;시간"/>
+			<item value="자동모"/>
+			<item value="init"/>
+			<item value="btnHumidifier"/>
 		</list>
 		<list key="replacehistory">
 		</list>

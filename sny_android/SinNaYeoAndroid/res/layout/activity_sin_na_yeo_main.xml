@@ -88,7 +88,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="32.33dp"
-            android:layout_marginRight="20.67dp"
+            android:layout_marginRight="25dp"
             android:background="#00ff0000"
             android:onClick="mOnClick"
             android:src="@drawable/btn_humid_off" />
@@ -100,7 +100,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="32.33dp"
-            android:layout_marginLeft="20.67dp"
+            android:layout_marginLeft="25dp"
             android:background="#00ff0000"
             android:onClick="mOnClick"
             android:src="@drawable/btn_window_closed" />
@@ -111,7 +111,7 @@
             android:layout_above="@id/main_window_btn"
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="15.33dp"
-            android:layout_marginLeft="23dp"
+            android:layout_marginLeft="25dp"
             android:orientation="horizontal" >
 
             <ImageView
@@ -174,7 +174,7 @@
             android:layout_above="@id/main_humidifier_btn"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="15.33dp"
-            android:layout_marginRight="23dp"
+            android:layout_marginRight="25dp"
             android:orientation="horizontal" >
 
             <ImageView

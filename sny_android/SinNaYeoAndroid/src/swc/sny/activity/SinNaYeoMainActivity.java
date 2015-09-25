@@ -7,9 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.LogManager;
-
-import com.google.android.gcm.GCMRegistrar;
 
 import swc.sny.service.GetDataService;
 import swc.sny.service.LocationReceiver;
@@ -32,13 +29,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.google.android.gcm.GCMRegistrar;
 
 public class SinNaYeoMainActivity extends Activity {
 	private Socket socket;
@@ -55,7 +52,7 @@ public class SinNaYeoMainActivity extends Activity {
 	private Calendar calendar;
 	private Date crtDate, setDate;
 	long setTime, leftTime;
-	int flagAutoMode, flagOutingMode;
+	int flagAutoMode, flagOutingMode, flagWindow, flagHumid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,34 +105,38 @@ public class SinNaYeoMainActivity extends Activity {
 		};
 		worker.start();
 
-		final Handler handler = new Handler();
+		final Handler handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				tvNowTemper.setText(msg.arg1 + " 도");
+				tvNowHumid.setText(msg.arg2 + " %");
+			}
+		};
+
 		if (socket != null) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								sendRequest("1");
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-							try {
-								in = new BufferedReader(new InputStreamReader(
-										socket.getInputStream()));
-								getTempHumid(in.readLine());
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					});
 
 					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
+						sendRequest("1");
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					try {
+						in = new BufferedReader(new InputStreamReader(
+								socket.getInputStream()));
+						String res = in.readLine();
+						String[] data = res.split(" ");
+						
+						Message msg = new Message();
+						msg.arg1 = Integer.parseInt(data[0]);
+						msg.arg2 = Integer.parseInt(data[1]);
+						handler.sendMessage(msg);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
 				}
 			}).start();
 		}
@@ -159,19 +160,22 @@ public class SinNaYeoMainActivity extends Activity {
 		switch (v.getId()) {
 		case R.id.main_automode_btn:
 			// sendRequest("");
-			if (flagAutoMode == 0) {
+			if (flagAutoMode == 0) { // auto on
 				flagAutoMode = 1;
 				btnAuto.setImageResource(R.drawable.btn_auto_on);
 				flagOutingMode = 0;
 				btnOuting.setClickable(true);
 				btnOuting.setImageResource(R.drawable.btn_outing_off);
+				sendRequest("m");
 			} else if (flagAutoMode == 1) {
 				flagAutoMode = 0;
 				btnAuto.setImageResource(R.drawable.btn_auto_off);
 				flagOutingMode = -1;
 				btnOuting.setClickable(false);
 				btnOuting.setImageResource(R.drawable.btn_outing_nonclickable);
+				sendRequest("n");
 			}
+			break;
 
 		case R.id.main_outing_btn:
 			// request = "o"; // on : o, off : f
@@ -181,104 +185,105 @@ public class SinNaYeoMainActivity extends Activity {
 						.show();
 				flagOutingMode = -1;
 			} else if (flagOutingMode == 0) {
-				flagOutingMode = 1;
-				btnOuting.setClickable(true);
-				btnOuting.setImageResource(R.drawable.btn_outing_on);
+				Rect displayRectangle = new Rect();
+				if (dialog != null) {
+					dialog.dismiss();
+					dialog = null;
+				}
+				dialog = new Dialog(SinNaYeoMainActivity.this);
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				Window window = dialog.getWindow();
+				window.getDecorView().getWindowVisibleDisplayFrame(
+						displayRectangle);
+				WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
+				wlp.copyFrom(window.getAttributes());
+				wlp.width = (int) (displayRectangle.width() * 0.69f);
+				wlp.height = (int) (displayRectangle.height() * 0.65f);
 
+				dialog.getWindow().setAttributes(wlp);
+				dialog.getWindow().setBackgroundDrawable(
+						new ColorDrawable(android.graphics.Color.TRANSPARENT));
+				LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+				View dialogView = (LinearLayout) vi.inflate(
+						R.layout.dialog_outing_setting, null);
+
+				final TimePicker time = (TimePicker) dialogView
+						.findViewById(R.id.dialog_timepicker);
+
+				ImageButton btnOk = (ImageButton) dialogView
+						.findViewById(R.id.dialog_ok_btn);
+				ImageButton btnCancel = (ImageButton) dialogView
+						.findViewById(R.id.dialog_cancel_btn);
+
+				btnOk.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View arg0) {
+						crtDate = new Date();
+						setDate = new Date();
+						setDate.setHours(time.getCurrentHour());
+						setDate.setMinutes(time.getCurrentMinute());
+
+						if ((time.getCurrentHour() == 0)
+								&& (time.getCurrentMinute() < 30)) {
+							Toast.makeText(SinNaYeoMainActivity.this,
+									"최소 30분 이후의 시간을 선택해주세요", 1).show();
+						} else {
+							flagOutingMode = 1;
+							btnOuting.setClickable(true);
+							btnOuting
+									.setImageResource(R.drawable.btn_outing_on);
+
+							setTime = setDate.getTime() - 30 * 60 * 1000;
+							String sTime = "b" + (setTime / 1000 / 60 / 60)
+									+ ":" + (setTime / 1000 % 60) + ":00";
+
+							try {
+								sendRequest("b" + sTime);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+							leftTime = setDate.getTime() - crtDate.getTime();
+
+							Toast.makeText(
+									SinNaYeoMainActivity.this,
+									"[ " + (leftTime / 1000 / 60 / 60) + "시간 "
+											+ (leftTime / 1000 / 60 % 60)
+											+ "분 ] 후로 설정되었습니다.",
+									Toast.LENGTH_LONG).show();
+							// InputMethodManager imm = (InputMethodManager)
+							// getSystemService(Context.INPUT_METHOD_SERVICE);
+							// imm.hideSoftInputFromWindow(edit_time.getWindowToken(),
+							// 0);
+
+							tvTime.setText("[ " + (leftTime / 1000 / 60 / 60)
+									+ "시간 " + (leftTime / 1000 / 60 % 60)
+									+ "분 ] 후로 설정되었습니다.");
+							tvTime.setVisibility(View.VISIBLE);
+
+							dialog.cancel();
+						}
+					}
+				});
+
+				btnCancel.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View arg0) {
+						dialog.cancel();
+					}
+				});
+
+				dialog.setCancelable(true);
+				dialog.setContentView(dialogView);
+				dialog.show();
 			} else if (flagOutingMode == 1) {
 				flagOutingMode = 0;
 				btnOuting.setClickable(true);
 				btnOuting.setImageResource(R.drawable.btn_outing_off);
+				tvTime.setVisibility(View.INVISIBLE);
 			} else {
-
 			}
-
-			Rect displayRectangle = new Rect();
-			if (dialog != null) {
-				dialog.dismiss();
-				dialog = null;
-			}
-			dialog = new Dialog(SinNaYeoMainActivity.this);
-			dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			Window window = dialog.getWindow();
-			window.getDecorView()
-					.getWindowVisibleDisplayFrame(displayRectangle);
-			WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
-			wlp.copyFrom(window.getAttributes());
-			wlp.width = (int) (displayRectangle.width() * 0.69f);
-			wlp.height = (int) (displayRectangle.height() * 0.65f);
-
-			dialog.getWindow().setAttributes(wlp);
-			dialog.getWindow().setBackgroundDrawable(
-					new ColorDrawable(android.graphics.Color.TRANSPARENT));
-			LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-			View dialogView = (LinearLayout) vi.inflate(
-					R.layout.dialog_outing_setting, null);
-
-			final TimePicker time = (TimePicker) dialogView
-					.findViewById(R.id.dialog_timepicker);
-
-			ImageButton btnOk = (ImageButton) dialogView
-					.findViewById(R.id.dialog_ok_btn);
-			ImageButton btnCancel = (ImageButton) dialogView
-					.findViewById(R.id.dialog_cancel_btn);
-
-			btnOk.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					crtDate = new Date();
-					setDate = new Date();
-					setDate.setHours(time.getCurrentHour());
-					setDate.setMinutes(time.getCurrentMinute());
-
-					if ((time.getCurrentHour() == 0)
-							&& (time.getCurrentMinute() < 30)) {
-						Toast.makeText(SinNaYeoMainActivity.this,
-								"최소 30분 이후의 시간을 선택해주세요", 1).show();
-					} else {
-						setTime = setDate.getTime() - 30 * 60 * 1000;
-						String sTime = "b" + (setTime / 1000 / 60 / 60) + ":"
-								+ (setTime / 1000 % 60) + ":00";
-
-						try {
-							sendRequest(sTime);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
-						leftTime = setDate.getTime() - crtDate.getTime();
-
-						Toast.makeText(
-								SinNaYeoMainActivity.this,
-								"[ " + (leftTime / 1000 / 60 / 60) + "시간 "
-										+ (leftTime / 1000 % 60)
-										+ "분 ] 후로 설정되었습니다.", Toast.LENGTH_LONG)
-								.show();
-						// InputMethodManager imm = (InputMethodManager)
-						// getSystemService(Context.INPUT_METHOD_SERVICE);
-						// imm.hideSoftInputFromWindow(edit_time.getWindowToken(),
-						// 0);
-
-						tvTime.setText("[ " + (leftTime / 1000 / 60 / 60)
-								+ "시간 " + (leftTime / 1000 % 60)
-								+ "분 ] 후로 설정되었습니다.");
-
-						dialog.cancel();
-					}
-				}
-			});
-
-			btnCancel.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					dialog.cancel();
-				}
-			});
-
-			dialog.setCancelable(true);
-			dialog.setContentView(dialogView);
-			dialog.show();
 
 			break;
 		case R.id.main_renew_btn:
@@ -295,16 +300,32 @@ public class SinNaYeoMainActivity extends Activity {
 
 			break;
 		case R.id.main_window_btn:
-			sendRequest("3");
+			if (flagWindow == 0) {
+				flagWindow = 1;
+				btnWindow.setImageResource(R.drawable.btn_window_open);
+				sendRequest("4");
+			} else {
+				flagWindow = 0;
+				btnWindow.setImageResource(R.drawable.btn_window_closed);
+				sendRequest("5");
+			}
 			break;
 		case R.id.main_humidifier_btn:
-			sendRequest("2");
+			if (flagHumid == 0) {
+				flagHumid = 1;
+				btnHumidifier.setImageResource(R.drawable.btn_humid_on);
+				sendRequest("2");
+			} else {
+				flagHumid = 0;
+				btnHumidifier.setImageResource(R.drawable.btn_humid_off);
+				sendRequest("3");
+			}
 			break;
 		default:
 			break;
 		}
 	}
-	
+
 	public void registerGcm() {
 		GCMRegistrar.checkDevice(this);
 		GCMRegistrar.checkManifest(this);
@@ -312,7 +333,6 @@ public class SinNaYeoMainActivity extends Activity {
 
 		if (regId.equals("")) {
 			Log.d("Tag", regId);
-			Toast.makeText(SinNaYeoMainActivity.this, regId, 1).show();
 			GCMRegistrar.register(this, "798195391733");
 		} else {
 			Log.d("Tag", regId);
@@ -340,8 +360,8 @@ public class SinNaYeoMainActivity extends Activity {
 
 				Log.i("****setTH", setT + "-" + setH);
 
-				tvSetTemper.setText("  설정 온도 : " + setT);
-				tvSetHumid.setText("  설정 습도 : " + setH);
+				tvSetTemper.setText("설정 온도 : " + setT);
+				tvSetHumid.setText("설정 습도 : " + setH);
 
 				try {
 					sendRequest("a" + setT + "-" + setH);
@@ -393,6 +413,8 @@ public class SinNaYeoMainActivity extends Activity {
 		request = "0";
 		flagAutoMode = 0;
 		flagOutingMode = -1;
+		flagWindow = 0;
+		flagHumid = 0;
 
 		locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Intent intent = new Intent(this, LocationReceiver.class);

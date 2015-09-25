@@ -39,10 +39,11 @@
 <fullyQualifiedTypeName name="swc.sny.service.LocationReceiver"/>
 <fullyQualifiedTypeName name="android.location.LocationManager"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
-<fullyQualifiedTypeName name="android.os.Message"/>
 <fullyQualifiedTypeName name="java.lang.Thread"/>
 <fullyQualifiedTypeName name="android.widget.ImageButton"/>
 <fullyQualifiedTypeName name="java.lang.Runnable"/>
-<fullyQualifiedTypeName name="swc.sny.activity.R.drawable"/>
 <fullyQualifiedTypeName name="swc.sny.activity.SinNaYeoMainActivity"/>
+<fullyQualifiedTypeName name="swc.sny.activity.R.drawable"/>
+<fullyQualifiedTypeName name="java.lang.Override"/>
+<fullyQualifiedTypeName name="android.os.Message"/>
 </qualifiedTypeNameHistroy>

@@ -1,0 +1,43 @@
+import gnu.io.CommPort;
+import gnu.io.SerialPort;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+
+
+/**
+ * 시리얼 읽기
+ */
+public class SerialReader extends Thread {
+	
+	// 안드로이드 클라이언트 쓰기
+	private BufferedReader reader = null;
+	public SerialReader(InputStream in) {
+		this.reader = new BufferedReader(new InputStreamReader(in));
+	}
+	
+
+	public void run() {
+		String str = "";
+		try {
+			while (true) {
+				str = reader.readLine();
+				GCMServerSide.sendMessage("왔다!!!");
+				if (!(str.equals("창문을 엽니다") || str.equals("창문을 닫습니다") || str.equals("열기") || str.equals("닫기"))){
+//					GCMServerSide.sendMessage();
+					SerialHelper.sendAll(str);
+				}
+				
+				System.out.println("read: " + str);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+}
+

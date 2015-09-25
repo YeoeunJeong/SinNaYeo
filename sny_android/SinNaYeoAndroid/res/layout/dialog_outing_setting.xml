@@ -3,13 +3,13 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="#ffffff"
-    android:orientation="vertical"
-    android:padding="10dp" >
+    android:orientation="vertical" >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:text="몇시에 집에 돌아오세요?"
         android:textSize="20sp" />
 
@@ -29,18 +29,18 @@
         <ImageButton
             android:id="@+id/dialog_cancel_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:background="#00ff0000"
-            android:src="@android:drawable/btn_dialog" />
+            android:src="@drawable/dialog_cancel" />
 
         <ImageButton
             android:id="@+id/dialog_ok_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:background="#00ff0000"
-            android:src="@android:drawable/btn_plus" />
+            android:src="@drawable/dialog_ok" />
     </LinearLayout>
 
 </LinearLayout>

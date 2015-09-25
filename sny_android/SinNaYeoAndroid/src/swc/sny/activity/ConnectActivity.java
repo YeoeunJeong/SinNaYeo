@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,17 +14,46 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 public class ConnectActivity extends Activity {
-	EditText editIp; 
+	EditText editIp;
 	ImageButton connectBtn;
- 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect);
-    
+
 		// start
-		editIp = (EditText) findViewById(R.id.connect_edit_ip); 
-		connectBtn = (ImageButton) findViewById(R.id.connect_btn); 
+		editIp = (EditText) findViewById(R.id.connect_edit_ip);
+
+		editIp.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				if (!editIp.getText().toString().equals("")) {
+					editIp.setBackgroundResource(R.drawable.img_connect_textbg);
+				} else {
+					editIp.setBackgroundResource(R.drawable.edit_connect_bg);
+				}
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				editIp.setBackgroundResource(R.drawable.edit_connect_bg);
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (!editIp.getText().toString().equals("")) {
+					editIp.setBackgroundResource(R.drawable.img_connect_textbg);
+				} else {
+					editIp.setBackgroundResource(R.drawable.edit_connect_bg);
+				}
+
+			}
+		});
+
+		connectBtn = (ImageButton) findViewById(R.id.connect_btn);
 		connectBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				String strIp = editIp.getText().toString();
